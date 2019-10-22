@@ -1,0 +1,53 @@
+{
+  "productions": [
+    {
+      "Left": "S",
+      "Right": [
+        ["V", "M"]
+      ]
+    },
+    {
+      "Left": "A",
+      "Right": [
+        ["V", "B"],
+        ["W", "N"]
+      ]
+    },
+    {
+      "Left": "B",
+      "Right": [
+        ["b"]
+      ]
+    },
+    {
+      "Left": "D",
+      "Right": [
+        ["d"]
+      ]
+    },
+    {
+      "Left": "V",
+      "Right": [
+        ["a"]
+      ]
+    },
+    {
+      "Left": "W",
+      "Right": [
+        ["b"]
+      ]
+    },
+    {
+      "Left": "M",
+      "Right": [
+        ["A", "D"]
+      ]
+    },
+    {
+      "Left": "N",
+      "Right": [
+        ["A", "B"]
+      ]
+    }
+  ]
+}

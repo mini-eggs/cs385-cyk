@@ -1,83 +1,62 @@
 package main
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"testing"
 
 	"gopkg.in/go-playground/assert.v1"
 )
 
-func TestExampleOne(t *testing.T) {
-	input := "bbabb"
-
-	g := Grammar{
-		Productions: []Production{
-			Production{
-				Left: "S",
-				Right: [][]string{
-					[]string{"A", "B"},
-				},
-			},
-			Production{
-				Left: "A",
-				Right: [][]string{
-					[]string{"B", "B"},
-					[]string{"a"},
-				},
-			},
-			Production{
-				Left: "B",
-				Right: [][]string{
-					[]string{"A", "B"},
-					[]string{"b"},
-				},
-			},
-		},
+func readfile(filename string) (g Grammar, err error) {
+	bytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return
 	}
 
-	val, err := CYK(input, g)
+	err = json.Unmarshal(bytes, &g)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func TestExampleOne(t *testing.T) {
+	// should fail
+	input := "bbabb"
+	grammar, err := readfile("example_input_one.json")
+	assert.Equal(t, err, nil)
+	val, err := CYK(input, grammar)
 	assert.Equal(t, err, nil)
 	assert.Equal(t, val, false)
 }
 
 func TestExampleTwo(t *testing.T) {
+	// should pass
 	input := "baaba"
-
-	g := Grammar{
-		Productions: []Production{
-			Production{
-				Left: "S",
-				Right: [][]string{
-					[]string{"A", "B"},
-					[]string{"B", "C"},
-				},
-			},
-			Production{
-				Left: "A",
-				Right: [][]string{
-					[]string{"B", "A"},
-					[]string{"a"},
-				},
-			},
-			Production{
-				Left: "B",
-				Right: [][]string{
-					[]string{"C", "C"},
-					[]string{"b"},
-				},
-			},
-			Production{
-				Left: "C",
-				Right: [][]string{
-					[]string{"A", "B"},
-					[]string{"a"},
-				},
-			},
-		},
-	}
-
-	val, err := CYK(input, g)
+	grammar, err := readfile("example_input_two.json")
+	assert.Equal(t, err, nil)
+	val, err := CYK(input, grammar)
 	assert.Equal(t, err, nil)
 	assert.Equal(t, val, true)
+}
+
+func TestExampleThree(t *testing.T) {
+	// should pass
+	input := "aabd"
+	grammar, err := readfile("example_input_three.json")
+	assert.Equal(t, err, nil)
+	val, err := CYK(input, grammar)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, val, true)
+	// should fail
+	input = "adbd"
+	grammar, err = readfile("example_input_three.json")
+	assert.Equal(t, err, nil)
+	val, err = CYK(input, grammar)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, val, false)
 }
 
 func TestMatrixComputations(t *testing.T) {

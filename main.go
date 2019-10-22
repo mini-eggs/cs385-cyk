@@ -239,10 +239,16 @@ func main() {
 	}
 
 	for index, filename := range args {
+		// Skip first case, this is the program name do to
+		// how command line args work, i.e.
+		// $ ./out/cyk-linux-bin %FILE
+		// if index == 0 then filename == "./out/cyk-linux-bin"
+		// obviously not a file!
 		if index == 0 {
 			continue
 		}
 
+		// Read file and report errors.
 		bytes, err := ioutil.ReadFile(filename)
 		if err != nil {
 			log.Fatal(err)
@@ -251,6 +257,8 @@ func main() {
 
 		var grammar Grammar
 
+		// Attempt to wrangle file into grammar.
+		// Report errors.
 		err = json.Unmarshal(bytes, &grammar)
 		if err != nil {
 			log.Fatal(err)
@@ -266,8 +274,10 @@ func main() {
 			return
 		}
 
+		// Remove whitespace from user input.
 		input = strings.TrimSpace(input)
 
+		// Work!
 		val, err := CYK(input, grammar)
 		if err != nil {
 			log.Fatal(err)
