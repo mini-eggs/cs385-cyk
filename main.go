@@ -25,6 +25,13 @@ type Production struct {
 
 // Helper functions.
 
+// matrixfromstring - given a string break it into
+// a matrix in a specific way.
+// example:
+//   input: "abcd"
+//   output: [ [ "a", "bcd" ],
+//             [ "ab", "cd" ],
+//             [ "abc", "d" ] ]
 func matrixfromstring(w string) [][]string {
 	l := len(w)
 
@@ -44,20 +51,62 @@ func matrixfromstring(w string) [][]string {
 	return ret
 }
 
-func matrixmultiply(m [][][]string) [][]string {
-	ret := [][]string{}
-
-	for _, column := range m {
-		for _, x := range column[0] {
-			for _, y := range column[1] {
-				ret = append(ret, []string{x, y})
+// matrixmerge - merge arrays in a specific way
+// example:
+// input:
+//   [ [ A, B, C ],
+//     [ M, N ],
+//     [ X, Y ] ]
+// output:
+//   [ [ A M X ],
+//   [ [ A M Y ],
+//   [ [ A N X ],
+//   [ [ A N Y ],
+//   [ [ B M X ],
+//   [ [ B M Y ],
+//   [ [ B N X ],
+//   [ [ B N Y ],
+//   [ [ C M X ],
+//   [ [ C M Y ],
+//   [ [ C N X ],
+//   [ [ C N Y ] ]
+func matrixmerge(in [][]string) (out [][]string) {
+	// base case
+	if len(in) < 2 {
+		for _, set := range in {
+			for _, value := range set {
+				out = append(out, []string{value})
 			}
+		}
+		return
+	}
+
+	// all other cases
+
+	first := in[0]
+	rest := matrixmerge(in[1:])
+
+	for _, firstItem := range first {
+		for _, row := range rest {
+			out = append(out, append([]string{firstItem}, row...))
 		}
 	}
 
+	return out
+}
+
+// cubemerge - one level above cube merge
+// take a n^3 array and merge it down into n^2
+func cubemerge(cube [][][]string) [][]string {
+	ret := [][]string{}
+	for _, matrix := range cube {
+		ret = append(ret, matrixmerge(matrix)...)
+	}
 	return ret
 }
 
+// matrixcompare - given two simple arrays
+// check if they are equal
 func matrixcompare(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
@@ -81,6 +130,9 @@ func CYK(w string, g Grammar) (bool, error) {
 		return false, errors.New("grammar has no productions; must have at least one production")
 	}
 
+	// The start symbol is assumed to be the
+	// variable on the left side of our first
+	// production.
 	startSym := g.Productions[0].Left
 
 	// Keep track of what generates what
@@ -145,7 +197,7 @@ func CYK(w string, g Grammar) (bool, error) {
 				// the grammar g. If so state so by storing the given left hand side of
 				// the production in our hash, using a key of the current string,
 				// strToMatch.
-				for _, matrix := range matrixmultiply(matrices) {
+				for _, matrix := range cubemerge(matrices) {
 					for _, row := range g.Productions {
 						for _, prod := range row.Right {
 							if matrixcompare(matrix, prod) {
@@ -183,6 +235,7 @@ func main() {
 	args := os.Args
 	if len(args) < 2 {
 		log.Fatal("must enter command line arguement of json file")
+		return
 	}
 
 	for index, filename := range args {
@@ -193,6 +246,7 @@ func main() {
 		bytes, err := ioutil.ReadFile(filename)
 		if err != nil {
 			log.Fatal(err)
+			return
 		}
 
 		var grammar Grammar
@@ -200,6 +254,7 @@ func main() {
 		err = json.Unmarshal(bytes, &grammar)
 		if err != nil {
 			log.Fatal(err)
+			return
 		}
 
 		fmt.Print("enter input text: ")
@@ -208,6 +263,7 @@ func main() {
 		input, err := bufio.NewReader(os.Stdin).ReadString('\n')
 		if err != nil {
 			log.Fatal(err)
+			return
 		}
 
 		input = strings.TrimSpace(input)

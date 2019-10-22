@@ -81,18 +81,38 @@ func TestExampleTwo(t *testing.T) {
 }
 
 func TestMatrixComputations(t *testing.T) {
-	val := matrixmultiply([][][]string{
-		[][]string{
-			[]string{"A", "B"},
-			[]string{"B", "C"},
-		},
+	val := matrixmerge([][]string{
+		[]string{"E"},
+		[]string{"A", "B"},
+		[]string{"B", "C"},
 	})
 
 	assert.Equal(t, val, [][]string{
-		[]string{"A", "B"},
-		[]string{"A", "C"},
-		[]string{"B", "B"},
-		[]string{"B", "C"},
+		[]string{"E", "A", "B"},
+		[]string{"E", "A", "C"},
+		[]string{"E", "B", "B"},
+		[]string{"E", "B", "C"},
+	})
+
+	val6 := matrixmerge([][]string{
+		[]string{"A", "B", "C"},
+		[]string{"M", "N"},
+		[]string{"X", "Y"},
+	})
+
+	assert.Equal(t, val6, [][]string{
+		[]string{"A", "M", "X"},
+		[]string{"A", "M", "Y"},
+		[]string{"A", "N", "X"},
+		[]string{"A", "N", "Y"},
+		[]string{"B", "M", "X"},
+		[]string{"B", "M", "Y"},
+		[]string{"B", "N", "X"},
+		[]string{"B", "N", "Y"},
+		[]string{"C", "M", "X"},
+		[]string{"C", "M", "Y"},
+		[]string{"C", "N", "X"},
+		[]string{"C", "N", "Y"},
 	})
 
 	val2 := matrixfromstring("abcd")
